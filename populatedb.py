@@ -2,6 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from database import Polution, Base, User
+import datetime
+
+datetime_object = datetime.datetime.now()
 
 engine = create_engine('sqlite:///polution.db')
 # Bind the engine to the metadata of the Base class so that the
@@ -23,7 +26,8 @@ user1 = User(name="zack peterson", email="zacktwp@gmail.com")
 session.add(user1)
 session.commit()
 
-Polution1 = Polution(name="first",
+Polution1 = Polution(created_date=datetime_object,
+                    name="first",
                     polution="0",
                     dew="0",
                     temp="0",

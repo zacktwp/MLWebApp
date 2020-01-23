@@ -1,9 +1,10 @@
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
+import datetime
 
 Base = declarative_base()
 
@@ -19,6 +20,7 @@ class Polution(Base):
     __tablename__ = 'polution'
 
     id = Column(Integer, primary_key=True)
+    created_date = Column(DateTime, default=datetime.datetime.utcnow)
     name = Column(String(250), nullable=False)
     polution = Column(String(8))
     dew = Column(String(8))

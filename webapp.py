@@ -9,6 +9,7 @@ from keras.models import load_model
 import pandas as pd
 import numpy as np
 import os
+import datetime
 
 import boto3
 import io
@@ -52,7 +53,7 @@ session = DBSession()
 @app.route('/')
 @app.route('/ml')
 def MLWebApp():
-    polution = session.query(Polution).order_by(Polution.name.desc()).first()
+    polution = session.query(Polution).order_by(Polution.created_date.desc()).first()
     return render_template('index.html', polution=polution)
 
 @app.route('/ml/forecast/', methods=['GET', 'POST'])
@@ -74,9 +75,9 @@ def forecast():
     else:
         return render_template('forecast.html')
 
-@app.route('/ml/results/', methods=['GET', 'POST'])
+@app.route('/ml/results/')
 def results():
-    polution = session.query(Polution).order_by(Polution.name.desc()).first()
+    polution = session.query(Polution).order_by(Polution.created_date.desc()).first()
     output = [[int(polution.polution),
               int(polution.dew),
               int(polution.temp),
