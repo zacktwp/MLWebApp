@@ -3,9 +3,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database import Base, Polution, User
 
-import tensorflow as tf
-from keras import backend as K
-from keras.models import load_model
+#import tensorflow as tf
+#from keras import backend as K
+#from keras.models import load_model
 import pandas as pd
 import numpy as np
 import os
@@ -13,7 +13,7 @@ import datetime
 
 import boto3
 import io
-
+'''
 class ScoringService(object):
     model = None                # Where we keep the model when it's loaded
 
@@ -39,7 +39,7 @@ class ScoringService(object):
         with sess.graph.as_default():
             clf = cls.get_model()
             return clf.predict(test_X)
-
+'''
 
 app = Flask(__name__)
 
@@ -86,11 +86,11 @@ def results():
               int(polution.wndspd),
               int(polution.snow),
               int(polution.rain)]]
-
+    test1 = [[1,1,1,1,1,1,1,1]]
     test = pd.DataFrame(output)
 
     #prediction localy
-    predictions = ScoringService.predict(test)
+    #predictions = ScoringService.predict(test)
 
     #prediction with sage maker
     payload = test
@@ -104,8 +104,7 @@ def results():
     sagemaker_results = response['Body'].read()
     #return str(predictions), str(sagemaker_results)
     #return str(sagemaker_results)
-    return render_template('results.html', local_prediction=predictions,
-                            sagemaker_prediction=sagemaker_results)
+    return render_template('results.html', sagemaker_prediction=sagemaker_results)
 
 if __name__ == '__main__':
     app.debug = True
