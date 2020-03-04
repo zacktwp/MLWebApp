@@ -94,11 +94,12 @@ def results():
 
     #prediction with sage maker
     payload = test
-    payload_file = io.StringIO()
+    #payload_file = io.StringIO()
+    payload_file = io.BytesIO()
     payload.to_csv(payload_file, header = None, index = None)
 
-    client = boto3.client('sagemaker-runtime')
-    response = client.invoke_endpoint(EndpointName='transcanada-poc-2020-01-14-20-02-57-206',
+    client = boto3.client('sagemaker-runtime', region_name='us-east-1')
+    response = client.invoke_endpoint(EndpointName='transcanada-poc2-2020-03-03-04-56-08-192',
                                       ContentType = 'text/csv',
                                       Body= payload_file.getvalue())
     sagemaker_results = response['Body'].read()

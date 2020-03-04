@@ -37,47 +37,51 @@ engine = create_engine('postgresql://catalog:password@localhost/catalog')
 
 sudo mv webapp.py __init__.py
 
-#create catalog.wsgi
+
+cd /var/www/
+
+sudo nano flaskapp.wsgi 
+
 #!/usr/bin/python
 import sys
 import logging
 logging.basicConfig(stream=sys.stderr)
-sys.path.insert(0, "/var/www/fullstack-nanodegree-vm/vagrant/catalog/")
+sys.path.insert(0,"/var/www/")
 
-from catalog import app as application
-
-application.secret_key = 'YOUR_SECRET_KEY'
+from mlwebapp import app as application
+application.secret_key = 'Add your secret key'
 
 #create host conf file
-sudo nano /etc/apache2/sites-available/catalog.conf
+sudo nano /etc/apache2/sites-available/FlaskApp.conf
 
 <VirtualHost *:80>
-	ServerName http://34.228.239.32
-	ServerAdmin admin@34.228.239.32
-	WSGIDaemonProcess catalog user=www-data group=www-data threads=5
-	WSGIProcessGroup catalog
-	WSGIApplicationGroup %{GLOBAL}
-	WSGIScriptAlias / /var/www/catalog.wsgi
-	<Directory /var/www/mlwebapp/>
-		Require all granted
-	</Directory>
-	Alias /static /var/www/mlwebapp/static
-	<Directory /var/www/mlwebapp/static/>
-		Require all granted
-	</Directory>
-	ErrorLog ${APACHE_LOG_DIR}/error.log
-	LogLevel warn
-	CustomLog ${APACHE_LOG_DIR}/access.log combined
+		ServerName mywebsite.com
+		ServerAdmin admin@mywebsite.com
+		WSGIScriptAlias / /var/www/flaskapp.wsgi
+		<Directory /var/www/mlwebapp/>
+			Order allow,deny
+			Allow from all
+		</Directory>
+		Alias /static /var/www/mlwebapp/static
+		<Directory /var/www/mlwebapp/static/>
+			Order allow,deny
+			Allow from all
+		</Directory>
+		ErrorLog ${APACHE_LOG_DIR}/error.log
+		LogLevel warn
+		CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 
 
 sudo a2dissite 000-default.conf
 
-sudo a2ensite catalog.conf
+sudo a2ensite FlaskApp
 
 sudo service apache2 restart
 
-python __init__.py
+sudo pip install awscli --upgrade
+
+sudo pip install boto3 --upgrade
 
 #error logs
 cd /var/log/apache2/
