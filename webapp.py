@@ -13,33 +13,7 @@ import datetime
 
 import boto3
 import io
-'''
-class ScoringService(object):
-    model = None                # Where we keep the model when it's loaded
 
-    @classmethod
-    def get_model(cls):
-        """Get the model object for this instance, loading it if it's not already loaded."""
-        if cls.model == None:
-            cls.model = load_model('meter831001_01.h5')
-        return cls.model
-
-
-    @classmethod
-    def predict(cls, input):
-        """For the input, do the predictions and return them.
-
-        Args:
-            input (a pandas dataframe): The data on which to do the predictions. There will be
-                one prediction per row in the dataframe"""
-        test_X = input.values
-        test_X = test_X.reshape((test_X.shape[0], 1, test_X.shape[1]))
-
-        sess = K.get_session()
-        with sess.graph.as_default():
-            clf = cls.get_model()
-            return clf.predict(test_X)
-'''
 
 app = Flask(__name__)
 
@@ -105,6 +79,50 @@ def results():
     sagemaker_results = response['Body'].read()
     #return str(predictions), str(sagemaker_results)
     #return str(sagemaker_results)
+
+    #prediction from athena
+    athena = boto3.client('athena', region_name='us-east-1')
+    s3     = boto3.resource('s3', region_name='us-east-1')
+    query = ("""SELECT * FROM pollution""")
+    print(query)
+    s3_bucket = 'aws-athena-query-results-532109487980-us-east-1'
+    database = "athenadbtest"
+    s3_ouput  = 's3://'+ s3_bucket
+    response = athena.start_query_execution(
+        QueryString=query,
+        QueryExecutionContext={
+            'Database': database
+        },
+        ResultConfiguration={
+            'OutputLocation': 's3://aws-athena-query-results-532109487980-us-east-1',
+    })
+
+
+    print(response)
+    QueryExecutionId = response['QueryExecutionId']
+    s3_key = QueryExecutionId + '.csv'
+    local_filename = QueryExecutionId + '.csv'
+    #s3.Bucket(s3_bucket).download_file(s3_key, local_filename)
+    time.sleep(10)
+    print(s3_key)
+    s33 = boto3.client('s3', region_name='us-east-1')
+
+    obj = s33.get_object(Bucket='aws-athena-query-results-532109487980-us-east-1', Key=s3_key)
+    df = pd.read_csv(obj['Body'])
+    #df = pd.read_csv(local_filename)
+    df = df.drop('index',axis=1)
+
+    #prediction with sage maker
+    payload2 = df
+    payload_file2 = io.BytesIO()
+    payload2.to_csv(payload_file2, header = None, index = None)
+
+    client = boto3.client('sagemaker-runtime', region_name='us-east-1')
+    response = client.invoke_endpoint(EndpointName='transcanada-poc2-2020-03-03-04-56-08-192',
+                                      ContentType = 'text/csv',
+                                      Body= payload_file2.getvalue())
+    sagemaker_results2 = response['Body'].read()
+
     return render_template('results.html', sagemaker_prediction=sagemaker_results)
 
 if __name__ == '__main__':

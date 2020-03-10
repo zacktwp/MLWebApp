@@ -40,7 +40,7 @@ sudo mv webapp.py __init__.py
 
 cd /var/www/
 
-sudo nano flaskapp.wsgi 
+sudo nano flaskapp.wsgi
 
 #!/usr/bin/python
 import sys
