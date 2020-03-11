@@ -1,3 +1,5 @@
+#once logged in to the ec2 instance run these commands
+
 sudo apt-get update
 
 sudo apt-get upgrade
@@ -42,6 +44,9 @@ cd /var/www/
 
 sudo nano flaskapp.wsgi
 
+# in the flaskapp.wsgi file copy and past the below code
+
+#start code
 #!/usr/bin/python
 import sys
 import logging
@@ -50,10 +55,12 @@ sys.path.insert(0,"/var/www/")
 
 from mlwebapp import app as application
 application.secret_key = 'Add your secret key'
+#end code
 
 #create host conf file
 sudo nano /etc/apache2/sites-available/FlaskApp.conf
 
+#copy the code below and past in the FlaskApp.conf file
 <VirtualHost *:80>
 		ServerName mywebsite.com
 		ServerAdmin admin@mywebsite.com
@@ -72,6 +79,8 @@ sudo nano /etc/apache2/sites-available/FlaskApp.conf
 		CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 
+
+# run the below commands
 
 sudo a2dissite 000-default.conf
 
