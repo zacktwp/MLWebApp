@@ -60,7 +60,7 @@ application.secret_key = 'Add your secret key'
 #create host conf file
 sudo nano /etc/apache2/sites-available/FlaskApp.conf
 
-#copy the code below and past in the FlaskApp.conf file
+#copy VirtualHost block below and replace ServerName and ServerAdmin with your ec2 ip address past in the FlaskApp.conf file
 <VirtualHost *:80>
 		ServerName mywebsite.com
 		ServerAdmin admin@mywebsite.com
